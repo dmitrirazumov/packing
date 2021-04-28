@@ -2,24 +2,31 @@ import java.util.*;
 
 class RecursPacking {
 
-    Types.Result spprg(int WidthStrip, ArrayList<Types.CoupleWH> rectanglesWH, String sorting) {
+    static long Height;
+    public static long endSortingTime1;
+    public static long endSortingTime2;
 
-        int D;
+    Types.Result spprg(long WidthStrip, ArrayList<Types.CoupleWH> rectanglesWH, String sorting) {
+
+        int wh = 0;
         int intermediateW;
-        ArrayList<Types.CoupleWH> remaining;
-        Map<Integer, Types.Rectangle> rectangles;
+
+        Map<Integer, Types.Rectangle> rectangles = new HashMap<>();
+        ArrayList<Types.CoupleWH> remaining = new ArrayList<>();
+        ArrayList<Integer> sorted_indexes = new ArrayList<>();
 
         if (sorting.equals("width"))
-            D = 0;
+            wh = 0;
         else if (sorting.equals("height"))
-            D = 1;
+            wh = 1;
 
-        rectangles = new HashMap<>();
         for (int i = 0; i < rectanglesWH.size(); i++) {
             rectangles.put(i, null);
         }
 
-        remaining = new ArrayList<>(rectanglesWH);
+        for (Types.CoupleWH element: rectanglesWH) {
+            remaining.add(new Types.CoupleWH(element.getW(), element.getH()));
+        }
 
         for (Types.CoupleWH element : remaining) {     //для каждого элемента поменять местами ширину и высоту
             if (element.getW() > element.getH()) {
@@ -30,16 +37,19 @@ class RecursPacking {
         }
 
         ArrayList<Types.CoupleWH> copy = new ArrayList<>(remaining);
-        ArrayList<Integer> sorted_indexes = new ArrayList<>();
 
-        Comparator<Types.CoupleWH> c = Collections.reverseOrder(new Types.SortByWidth());
-        copy.sort(c);    // получили отсортированные прямоугольники
+        if (wh == 0) {
+            Comparator<Types.CoupleWH> c = Collections.reverseOrder(new Types.SortByWidth());  // сортировка прямоугольников по ширине
+            endSortingTime1 = System.currentTimeMillis();
+            copy.sort(c);
+            endSortingTime2 = System.currentTimeMillis();
+        }
 
         for (Types.CoupleWH element : copy) {        //получить список индексов прямоугольников с шириной по убыванию   TODO для невозрастающей высоты
             sorted_indexes.add(remaining.indexOf(element));
         }
 
-        int x, y, w, h, H;
+        long x, y, w, h, H;
         x = 0;
         y = 0;
         H = 0;
@@ -67,15 +77,16 @@ class RecursPacking {
                 H = H + r.getW();
             }
 
-            recursive_packing(x, y, w, h, 0, remaining, sorted_indexes, rectangles);
+            recursive_packing(x, y, w, h, 1, remaining, sorted_indexes, rectangles);
             x = 0;
             y = H;
+            Height = H;
         }
 
         return new Types.Result(y, rectangles);
     }
 
-    private void recursive_packing(int x, int y, int w, int h, int D,
+    private void recursive_packing(long x, long y, long w, long h, int wh,
                                    ArrayList<Types.CoupleWH> remaining, ArrayList<Integer> indexes, Map<Integer, Types.Rectangle> result) {
 
         int priority = 6;
@@ -85,28 +96,28 @@ class RecursPacking {
         long min_w, min_h;
 
         for (int id : indexes) {
-            for (int j = 0; j < D + 1; j++) {
+            for (int j = 0; j < wh + 1; j++) {
                 if ((priority > 1) &&
-                        (remaining.get(id).getWidthOrHeight((0 + j) % 2) == w) &&
+                        (remaining.get(id).getWidthOrHeight(j % 2) == w) &&
                         (remaining.get(id).getWidthOrHeight((1 + j) % 2) == h)) {
                     priority = 1;
                     orientation = j;
                     best = id;
                     break;
                 } else if ((priority > 2) &&
-                        (remaining.get(id).getWidthOrHeight((0 + j) % 2) == w) &&
+                        (remaining.get(id).getWidthOrHeight(j % 2) == w) &&
                         (remaining.get(id).getWidthOrHeight((1 + j) % 2) < h)) {
                     priority = 2;
                     orientation = j;
                     best = id;
                 } else if ((priority > 3) &&
-                        (remaining.get(id).getWidthOrHeight((0 + j) % 2) < w) &&
+                        (remaining.get(id).getWidthOrHeight(j % 2) < w) &&
                         (remaining.get(id).getWidthOrHeight((1 + j) % 2) == h)) {
                     priority = 3;
                     orientation = j;
                     best = id;
                 } else if ((priority > 4) &&
-                        (remaining.get(id).getWidthOrHeight((0 + j) % 2) < w) &&
+                        (remaining.get(id).getWidthOrHeight(j % 2) < w) &&
                         (remaining.get(id).getWidthOrHeight((1 + j) % 2) < h)) {
                     priority = 4;
                     orientation = j;
@@ -133,9 +144,9 @@ class RecursPacking {
             indexes.remove(new Integer(best));
 
             if (priority == 2)
-                recursive_packing(x, y + d, w, h - d, D, remaining, indexes, result);
+                recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result);
             else if (priority == 3)
-                recursive_packing(x + psi, y, w - psi, h, D, remaining, indexes, result);
+                recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result);
             else if (priority == 4) {
 
                 min_w = Long.MAX_VALUE;
@@ -150,18 +161,35 @@ class RecursPacking {
                 min_h = min_w;
 
                 if ((w - psi) < min_w)
-                    recursive_packing(x, y + d, w, h - d, D, remaining, indexes, result);
+                    recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result);
                 else if ((h - d) < min_h)
-                    recursive_packing(x + psi, y, w - psi, h, D, remaining, indexes, result);
+                    recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result);
                 else if (psi < min_w) {
-                    recursive_packing(x + psi, y, w - psi, d, D, remaining, indexes, result);
-                    recursive_packing(x, y + d, w, h - d, D, remaining, indexes, result);
+                    recursive_packing(x + psi, y, w - psi, d, wh, remaining, indexes, result);
+                    recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result);
                 } else {
-                    recursive_packing(x, y + d, psi, h - d, D, remaining, indexes, result);
-                    recursive_packing(x + psi, y, w - psi, h, D, remaining, indexes, result);
+                    recursive_packing(x, y + d, psi, h - d, wh, remaining, indexes, result);
+                    recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result);
                 }
             }
 
         }
+    }
+
+    double efficiencyRatio(long width, long height, ArrayList<Types.Rectangle> rectangles) {
+
+        double tapeArea;
+        double wasteArea;
+        double rectanglesAreas = 0;
+
+        for (Types.Rectangle rectangle : rectangles) {
+            rectanglesAreas = rectanglesAreas + (rectangle.getW() * rectangle.getH());
+        }
+
+        tapeArea = (double) width * height;
+        wasteArea = tapeArea - rectanglesAreas;
+
+        System.out.println("Площадь отходов = " + wasteArea);
+        return ((wasteArea * 100) / tapeArea);
     }
 }

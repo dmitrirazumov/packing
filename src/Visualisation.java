@@ -13,10 +13,11 @@ public class Visualisation extends JPanel {
         JFrame frame = new JFrame("Draw Rectangles");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        for (Types.Rectangle element: rectangles) {
-            frame.add(new JPanel() {
-                @Override
-                protected void paintComponent(Graphics g) {
+//        while (RecursPacking.Height < 1200) {
+            for (Types.Rectangle element : rectangles) {
+                frame.add(new JPanel() {
+                    @Override
+                    protected void paintComponent(Graphics g) {
                         Graphics2D g2 = (Graphics2D) g;
                         g2.setColor(new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat()));
 
@@ -26,15 +27,19 @@ public class Visualisation extends JPanel {
                         double height = element.getH();
 
                         g2.fill(new Rectangle2D.Double(x, y, width, height));
-                        g2.drawString(Integer.toString(rectangles.indexOf(element)), element.getX() + element.getW()/2, element.getY() + element.getH()/2);
-                }
-            });
 
-            frame.pack();
-            frame.setSize(new Dimension(WidthStrip, HeightStrip));
-            frame.setVisible(true);
+                        Font font = new Font("Arial", Font.BOLD, 12);
+                        g2.setFont(font);
+                        g2.setColor(Color.BLACK);
+                        g2.drawString(Integer.toString(rectangles.indexOf(element)), element.getX() + element.getW() / 2, element.getY() + element.getH() / 2);
+                    }
+                });
+
+                frame.pack();
+                frame.setSize(new Dimension(WidthStrip, HeightStrip));
+                frame.setVisible(true);
+            }
         }
-    }
+//    }
 }
-
 

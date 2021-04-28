@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Types {
 
-    static class CoupleWH {
+    static class CoupleWH implements Cloneable {
 
         private int w;
         private int h;
@@ -34,6 +34,7 @@ public class Types {
         public void setH(int h) {
             this.h = h;
         }
+
     }
 
     static class SortByWidth implements Comparator<CoupleWH> {
@@ -46,12 +47,12 @@ public class Types {
 
     static class Rectangle {
 
-        private int x;
-        private int y;
-        private int w;
-        private int h;
+        private long x;
+        private long y;
+        private long w;
+        private long h;
 
-        Rectangle(int x, int y, int w, int h) {
+        Rectangle(long x, long y, long w, long h) {
             this.x = x;
             this.y = y;
             this.w = w;
@@ -59,7 +60,7 @@ public class Types {
         }
 
 
-        public int getX() {
+        public long getX() {
             return x;
         }
 
@@ -67,7 +68,7 @@ public class Types {
             this.x = x;
         }
 
-        public int getY() {
+        public long getY() {
             return y;
         }
 
@@ -75,7 +76,7 @@ public class Types {
             this.y = y;
         }
 
-        public int getW() {
+        public long getW() {
             return w;
         }
 
@@ -83,7 +84,7 @@ public class Types {
             this.w = w;
         }
 
-        public int getH() {
+        public long getH() {
             return h;
         }
 
@@ -94,15 +95,15 @@ public class Types {
 
     static class Result {
 
-        private int HeightStrip;
+        private long HeightStrip;
         private Map<Integer, Rectangle> rectangles;
 
-        Result(int HeightStrip, Map<Integer, Types.Rectangle> rectangles) {
+        Result(long HeightStrip, Map<Integer, Types.Rectangle> rectangles) {
             this.HeightStrip = HeightStrip;
             this.rectangles = rectangles;
         }
 
-        public int getHeightStrip() {
+        public long getHeightStrip() {
             return HeightStrip;
         }
 
