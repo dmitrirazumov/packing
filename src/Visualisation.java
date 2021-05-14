@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -6,12 +7,14 @@ import java.util.Random;
 
 public class Visualisation extends JPanel {
 
-    static void createFrame(int WidthStrip, int HeightStrip, ArrayList<Types.Rectangle> rectangles) {
+    static void createFrame(int WidthStrip, int HeightStrip, ArrayList<Types.Rectangle> rectangles, ArrayList<Types.Area> emptyAreas) {
 
         Random rand = new Random();
 
         JFrame frame = new JFrame("Draw Rectangles");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        Border redBorder = BorderFactory.createLineBorder(Color.RED);
 
 //        while (RecursPacking.Height < 1200) {
             for (Types.Rectangle element : rectangles) {
@@ -27,6 +30,10 @@ public class Visualisation extends JPanel {
                         double height = element.getH();
 
                         g2.fill(new Rectangle2D.Double(x, y, width, height));
+
+//                        if (rectangles.indexOf(element) == 3) g2.fill(new Rectangle2D.Double(250, 420, 50, 20));
+//                        if (rectangles.indexOf(element) == 4) g2.fill(new Rectangle2D.Double(340, 340, 10, 80));
+//                        if (rectangles.indexOf(element) == 5) g2.fill(new Rectangle2D.Double(300, 420, 50, 20));
 
                         Font font = new Font("Arial", Font.BOLD, 12);
                         g2.setFont(font);

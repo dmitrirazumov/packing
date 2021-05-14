@@ -14,6 +14,7 @@ class RecursPacking {
         Map<Integer, Types.Rectangle> rectangles = new HashMap<>();
         ArrayList<Types.CoupleWH> remaining = new ArrayList<>();
         ArrayList<Integer> sorted_indexes = new ArrayList<>();
+        ArrayList<Types.Area> areas = new ArrayList<>();
 
         if (sorting.equals("width"))
             wh = 0;
@@ -77,17 +78,20 @@ class RecursPacking {
                 H = H + r.getW();
             }
 
-            recursive_packing(x, y, w, h, 1, remaining, sorted_indexes, rectangles);
+            areas.add(new Types.Area(x, y, w ,h));
+            recursive_packing(x, y, w, h, 1, remaining, sorted_indexes, rectangles, areas);
             x = 0;
             y = H;
             Height = H;
         }
 
-        return new Types.Result(y, rectangles);
+        return new Types.Result(y, rectangles, areas);
     }
 
     private void recursive_packing(long x, long y, long w, long h, int wh,
-                                   ArrayList<Types.CoupleWH> remaining, ArrayList<Integer> indexes, Map<Integer, Types.Rectangle> result) {
+                                   ArrayList<Types.CoupleWH> remaining, ArrayList<Integer> indexes, Map<Integer, Types.Rectangle> result, ArrayList<Types.Area> areas) {
+
+        int lastArea = areas.size() - 1;
 
         int priority = 6;
         int orientation = 0;
@@ -132,6 +136,8 @@ class RecursPacking {
 
         if (priority < 5) {
 
+            areas.remove(lastArea);
+
             if (orientation == 0) {
                 psi = remaining.get(best).getW();
                 d = remaining.get(best).getH();
@@ -143,10 +149,14 @@ class RecursPacking {
             result.put(best, new Types.Rectangle(x, y, psi, d));
             indexes.remove(new Integer(best));
 
-            if (priority == 2)
-                recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result);
-            else if (priority == 3)
-                recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result);
+            if (priority == 2) {
+                areas.add(new Types.Area(x, y + d, w, h - d));
+                recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result, areas);
+            }
+            else if (priority == 3) {
+                areas.add(new Types.Area(x + psi, y, w - psi, h));
+                recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result, areas);
+            }
             else if (priority == 4) {
 
                 min_w = Long.MAX_VALUE;
@@ -160,16 +170,26 @@ class RecursPacking {
                 min_w = Math.min(min_h, min_w);
                 min_h = min_w;
 
-                if ((w - psi) < min_w)
-                    recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result);
-                else if ((h - d) < min_h)
-                    recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result);
+                if ((w - psi) < min_w) {
+                    areas.add(new Types.Area(x + psi, y, w - psi, d));
+                    areas.add(new Types.Area(x, y + d, w, h - d));
+                    recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result, areas);
+                }
+                else if ((h - d) < min_h) {
+                    areas.add(new Types.Area(x, y + d, psi, h - d));
+                    areas.add(new Types.Area(x + psi, y, w - psi, h));
+                    recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result, areas);
+                }
                 else if (psi < min_w) {
-                    recursive_packing(x + psi, y, w - psi, d, wh, remaining, indexes, result);
-                    recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result);
+                    areas.add(new Types.Area(x + psi, y, w - psi, d));
+                    recursive_packing(x + psi, y, w - psi, d, wh, remaining, indexes, result, areas);
+                    areas.add(new Types.Area(x, y + d, w, h - d));
+                    recursive_packing(x, y + d, w, h - d, wh, remaining, indexes, result, areas);
                 } else {
-                    recursive_packing(x, y + d, psi, h - d, wh, remaining, indexes, result);
-                    recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result);
+                    areas.add(new Types.Area(x, y + d, psi, h - d));
+                    recursive_packing(x, y + d, psi, h - d, wh, remaining, indexes, result, areas);
+                    areas.add(new Types.Area(x + psi, y, w - psi, h));
+                    recursive_packing(x + psi, y, w - psi, h, wh, remaining, indexes, result, areas);
                 }
             }
 
