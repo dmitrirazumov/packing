@@ -105,7 +105,7 @@ public class PackingHelper {
         return areas;
     }
 
-    ArrayList<ArrayList<Integer>> combinationsOfAreas(ArrayList<Types.Area> areas) {
+    ArrayList<Types.Combination> combinationsOfAreas(ArrayList<Types.Area> areas) {
 
         Types.Area firstCandidate = null;
         Types.Area interCandidate;
@@ -114,7 +114,7 @@ public class PackingHelper {
 
         ArrayList<Integer> sortedAreas = new ArrayList<>();
         ArrayList<Integer> combination = new ArrayList<>();
-        ArrayList<ArrayList<Integer>> combinations = new ArrayList<>();
+        ArrayList<Types.Combination> combinations = new ArrayList<>();
         ArrayList<Types.Area> candidates = new ArrayList<>();
 
         ArrayList<Types.Area> copy = new ArrayList<>(areas);
@@ -153,7 +153,7 @@ public class PackingHelper {
 //                if (interCandidates.size() == 0) candidates.remove(0);
             }
 
-            combinations.add(new ArrayList<>(combination));
+            if (!combinations.contains(new Types.Combination(combination))) combinations.add(new Types.Combination(new ArrayList<>(combination)));
             combination.clear();
 
         } while (!sortedAreas.isEmpty());

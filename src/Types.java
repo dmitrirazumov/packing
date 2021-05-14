@@ -223,6 +223,11 @@ public class Types {
         }
 
         @Override
+        public String toString() {
+            return "" + combination + "";
+        }
+
+        @Override
         public boolean equals(Object obj) {
 
             if (this == obj) return true;

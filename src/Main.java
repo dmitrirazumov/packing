@@ -171,7 +171,7 @@ public class Main {
         emptyAreas = result.getEmptyAreas();
         emptyAreas = new PackingHelper().mergingAreas(emptyAreas);
 
-        ArrayList<ArrayList<Integer>> combinations = new PackingHelper().combinationsOfAreas(emptyAreas);
+        ArrayList<Types.Combination> combinations = new PackingHelper().combinationsOfAreas(emptyAreas);
 
         for (int i = 0; i < combinations.size(); i++) {
             System.out.println("Комбинация " + i + ": " + combinations.get(i));
