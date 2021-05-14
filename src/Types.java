@@ -213,4 +213,27 @@ public class Types {
             return (int) (o1.h - o2.h);
         }
     }
+
+    static class Combination {
+
+        private ArrayList<Integer> combination;
+
+        Combination(ArrayList<Integer> combination) {
+            this.combination = combination;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+
+            if (this == obj) return true;
+            if (obj == null) return false;
+            if (getClass() != obj.getClass()) return false;
+
+            ArrayList<Integer> copy = new ArrayList<>(combination);
+            Combination other = (Combination) obj;
+
+            copy.removeAll(other.combination);
+            return copy.isEmpty();
+        }
+    }
 }

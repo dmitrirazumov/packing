@@ -105,24 +105,29 @@ public class PackingHelper {
         return areas;
     }
 
-    ArrayList<ArrayList<Types.Area>> combinationsOfAreas(ArrayList<Types.Area> areas) {
+    ArrayList<ArrayList<Integer>> combinationsOfAreas(ArrayList<Types.Area> areas) {
 
         Types.Area firstCandidate = null;
         Types.Area interCandidate;
         ArrayList<Types.Area> interCandidates;
         ArrayList<Types.Area> candidatesCopy = null;
 
-        ArrayList<Types.Area> combination = new ArrayList<>();
-        ArrayList<ArrayList<Types.Area>> combinations = new ArrayList<>();
+        ArrayList<Integer> sortedAreas = new ArrayList<>();
+        ArrayList<Integer> combination = new ArrayList<>();
+        ArrayList<ArrayList<Integer>> combinations = new ArrayList<>();
         ArrayList<Types.Area> candidates = new ArrayList<>();
 
-        ArrayList<Types.Area> sortedAreas = new ArrayList<>(areas);
+        ArrayList<Types.Area> copy = new ArrayList<>(areas);
         Comparator<Types.Area> c = Collections.reverseOrder(new Types.sortAreasByHeight());
-        sortedAreas.sort(c);
+        copy.sort(c);
+
+        for (Types.Area element : copy) {
+            sortedAreas.add(areas.indexOf(element));
+        }
 
         do {
             if (candidates.isEmpty()) {
-                firstCandidate = sortedAreas.get(0);
+                firstCandidate = areas.get(sortedAreas.get(0));
                 sortedAreas.remove(0);
                 candidates = formCandidates(firstCandidate, areas);
                 candidatesCopy = new ArrayList<>(candidates);
@@ -130,18 +135,18 @@ public class PackingHelper {
 
             interCandidate = candidates.get(0);
             candidates.remove(0);
-            combination.add(firstCandidate);
-            combination.add(interCandidate);
+            combination.add(areas.indexOf(firstCandidate));
+            combination.add(areas.indexOf(interCandidate));
             interCandidates = formCandidates(interCandidate, candidatesCopy);
 
-            while(!interCandidates.isEmpty()) {
+            while (!interCandidates.isEmpty()) {
                 if (interCandidates.size() == 1) {
-                    combination.add(interCandidates.get(0));
+                    combination.add(areas.indexOf(interCandidates.get(0)));
                     interCandidates.remove(0);
                 }
                 if (interCandidates.size() > 1) {
                     interCandidate = interCandidates.get(0);
-                    combination.add(interCandidate);
+                    combination.add(areas.indexOf(interCandidate));
                     interCandidates.remove(0);
                     interCandidates = formCandidates(interCandidate, interCandidates);
                 }
