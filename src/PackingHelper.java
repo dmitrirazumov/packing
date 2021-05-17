@@ -1,9 +1,10 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
 public class PackingHelper {
+
+    private static int STEPS = 0;
 
     ArrayList<Types.Area> mergingAreas(ArrayList<Types.Area> areas) {
 
@@ -70,35 +71,35 @@ public class PackingHelper {
                     if (!areas.contains(newArea)) areas.add(newArea);
                 }
 
-                //Vertical 1
-                if ((areas.get(i).getX() <= areas.get(j).getX()) &&
-                        ((areas.get(i).getX() + areas.get(i).getW()) >= (areas.get(j).getX() + areas.get(j).getW())) &&
-                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
-
-                    Types.Area newArea = new Types.Area(
-                            areas.get(j).getX(),
-                            areas.get(i).getY(),
-                            areas.get(j).getW(),
-                            areas.get(i).getH() + areas.get(j).getH()
-                    );
-
-                    if (!areas.contains(newArea)) areas.add(newArea);
-                }
-
-                //Vertical 2
-                if ((areas.get(i).getX() >= areas.get(j).getX()) &&
-                        ((areas.get(i).getX() + areas.get(i).getW()) <= (areas.get(j).getX() + areas.get(j).getW())) &&
-                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
-
-                    Types.Area newArea = new Types.Area(
-                            areas.get(i).getX(),
-                            areas.get(i).getY(),
-                            areas.get(i).getW(),
-                            areas.get(i).getH() + areas.get(j).getH()
-                    );
-
-                    if (!areas.contains(newArea)) areas.add(newArea);
-                }
+//                //Vertical 1
+//                if ((areas.get(i).getX() <= areas.get(j).getX()) &&
+//                        ((areas.get(i).getX() + areas.get(i).getW()) >= (areas.get(j).getX() + areas.get(j).getW())) &&
+//                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
+//
+//                    Types.Area newArea = new Types.Area(
+//                            areas.get(j).getX(),
+//                            areas.get(i).getY(),
+//                            areas.get(j).getW(),
+//                            areas.get(i).getH() + areas.get(j).getH()
+//                    );
+//
+//                    if (!areas.contains(newArea)) areas.add(newArea);
+//                }
+//
+//                //Vertical 2
+//                if ((areas.get(i).getX() >= areas.get(j).getX()) &&
+//                        ((areas.get(i).getX() + areas.get(i).getW()) <= (areas.get(j).getX() + areas.get(j).getW())) &&
+//                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
+//
+//                    Types.Area newArea = new Types.Area(
+//                            areas.get(i).getX(),
+//                            areas.get(i).getY(),
+//                            areas.get(i).getW(),
+//                            areas.get(i).getH() + areas.get(j).getH()
+//                    );
+//
+//                    if (!areas.contains(newArea)) areas.add(newArea);
+//                }
             }
         }
 
@@ -127,36 +128,41 @@ public class PackingHelper {
 
         do {
             if (candidates.isEmpty()) {
+                STEPS++;
                 firstCandidate = areas.get(sortedAreas.get(0));
                 sortedAreas.remove(0);
                 candidates = formCandidates(firstCandidate, areas);
                 candidatesCopy = new ArrayList<>(candidates);
             }
 
-            interCandidate = candidates.get(0);
-            candidates.remove(0);
-            combination.add(areas.indexOf(firstCandidate));
-            combination.add(areas.indexOf(interCandidate));
-            interCandidates = formCandidates(interCandidate, candidatesCopy);
+            if (!candidates.isEmpty()) {
 
-            while (!interCandidates.isEmpty()) {
-                if (interCandidates.size() == 1) {
-                    combination.add(areas.indexOf(interCandidates.get(0)));
-                    interCandidates.remove(0);
-                }
-                if (interCandidates.size() > 1) {
-                    interCandidate = interCandidates.get(0);
-                    combination.add(areas.indexOf(interCandidate));
-                    interCandidates.remove(0);
-                    interCandidates = formCandidates(interCandidate, interCandidates);
-                }
+                interCandidate = candidates.get(0);
+                candidates.remove(0);
+                combination.add(areas.indexOf(firstCandidate));
+                combination.add(areas.indexOf(interCandidate));
+                interCandidates = formCandidates(interCandidate, candidatesCopy);
+
+                while (!interCandidates.isEmpty()) {
+                    if (interCandidates.size() == 1) {
+                        combination.add(areas.indexOf(interCandidates.get(0)));
+                        interCandidates.remove(0);
+                    }
+                    if (interCandidates.size() > 1) {
+                        interCandidate = interCandidates.get(0);
+                        combination.add(areas.indexOf(interCandidate));
+                        interCandidates.remove(0);
+                        interCandidates = formCandidates(interCandidate, interCandidates);
+                    }
 //                if (interCandidates.size() == 0) candidates.remove(0);
+                }
+
+                if (!combinations.contains(new Types.Combination(combination)))
+                    combinations.add(new Types.Combination(new ArrayList<>(combination)));
+                combination.clear();
             }
 
-            if (!combinations.contains(new Types.Combination(combination))) combinations.add(new Types.Combination(new ArrayList<>(combination)));
-            combination.clear();
-
-        } while (!sortedAreas.isEmpty());
+        } while (!sortedAreas.isEmpty() && STEPS < 5);
 
         return combinations;
 

@@ -9,8 +9,8 @@ public class Main {
 
         final long startTime = System.currentTimeMillis();
         ArrayList<Types.Rectangle> rectangles;
-        ArrayList<Types.Area> emptyAreas = new ArrayList<>();
-        long WidthStrip = 350;
+        ArrayList<Types.Areas> emptyAreas;
+        long WidthStrip = 340;
         ArrayList<Types.CoupleWH> boxes = new ArrayList<>();
         double efficiency;
 
@@ -54,6 +54,11 @@ public class Main {
 //            boxes.add(new Types.CoupleWH(100, 200));
 //        }
 
+        boxes.add(new Types.CoupleWH(250, 100));
+        boxes.add(new Types.CoupleWH(250, 100));
+        boxes.add(new Types.CoupleWH(100, 50));
+//        boxes.add(new Types.CoupleWH(20, 50));
+
 //        boxes.add(new Types.CoupleWH(250, 50));
 //        boxes.add(new Types.CoupleWH(250, 50));
 //        boxes.add(new Types.CoupleWH(100, 200));
@@ -85,19 +90,17 @@ public class Main {
 //        boxes.add(new Types.CoupleWH(50, 20));
 //        boxes.add(new Types.CoupleWH(100, 100));
 //        boxes.add(new Types.CoupleWH(100, 50));
-//        boxes.add(new Types.CoupleWH(250, 80));
-//        boxes.add(new Types.CoupleWH(250, 80));
 
-        boxes.add(new Types.CoupleWH(50, 30));
-        boxes.add(new Types.CoupleWH(250, 80));
-        boxes.add(new Types.CoupleWH(250, 80));
-        boxes.add(new Types.CoupleWH(100, 200));
-        boxes.add(new Types.CoupleWH(100, 200));
-        boxes.add(new Types.CoupleWH(80, 40));
-        boxes.add(new Types.CoupleWH(50, 50));
-        boxes.add(new Types.CoupleWH(50, 50));
-        boxes.add(new Types.CoupleWH(50, 50));
-        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(50, 30));
+//        boxes.add(new Types.CoupleWH(250, 80));
+//        boxes.add(new Types.CoupleWH(250, 80));
+//        boxes.add(new Types.CoupleWH(100, 200));
+//        boxes.add(new Types.CoupleWH(100, 200));
+//        boxes.add(new Types.CoupleWH(80, 40));
+//        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(50, 50));
 
 
 //        boxes.add(new Types.CoupleWH(50, 30));
@@ -169,14 +172,14 @@ public class Main {
         HeightStrip = result.getHeightStrip();
         rectangles = result.getRectanglesWithoutId();
         emptyAreas = result.getEmptyAreas();
-        emptyAreas = new PackingHelper().mergingAreas(emptyAreas);
-
-        ArrayList<Types.Combination> combinations = new PackingHelper().combinationsOfAreas(emptyAreas);
-
-        for (int i = 0; i < combinations.size(); i++) {
-            System.out.println("Комбинация " + i + ": " + combinations.get(i));
-            }
-        System.out.println("");
+//        emptyAreas = new PackingHelper().mergingAreas(emptyAreas);
+//
+//        ArrayList<Types.Combination> combinations = new PackingHelper().combinationsOfAreas(emptyAreas);
+//
+//        for (int i = 0; i < combinations.size(); i++) {
+//            System.out.println("Комбинация " + i + ": " + combinations.get(i));
+//            }
+//        System.out.println("");
 
 
 
@@ -215,13 +218,11 @@ public class Main {
 
         System.out.println("");
 
-        for (int i = 0; i < emptyAreas.size(); i++) {
-            System.out.println("Пустая область " + i + " : " +
-                    "w = " + emptyAreas.get(i).getW() + ", " +
-                    "h = " + emptyAreas.get(i).getH() + ", " +
-                    "x = " + emptyAreas.get(i).getX() + ", " +
-                    "y = " + emptyAreas.get(i).getY());
+        for (Types.Areas emptyArea : emptyAreas) {
+            System.out.println("Пустые области в секции " + emptyArea.getSection() + ": " + emptyArea.getAreas());
         }
+
+        System.out.println("");
 
         final long endTime = System.currentTimeMillis();
 
@@ -238,7 +239,7 @@ public class Main {
         System.out.println("Время сортировки прямоугольников: " + (double) (RecursPacking.endSortingTime2 - startTime) + " сек");
         System.out.println("Время выполнения программы: " + (double) (endTime - startTime) / 1000 + " сек");
 //
-        Visualisation.createFrame((int) WidthStrip + 50, (int) HeightStrip + 50, rectangles, emptyAreas);
+        Visualisation.createFrame((int) WidthStrip + 50, (int) HeightStrip + 50, rectangles);
     }
 
 }

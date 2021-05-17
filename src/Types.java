@@ -97,9 +97,9 @@ public class Types {
 
         private long HeightStrip;
         private Map<Integer, Rectangle> rectangles;
-        private ArrayList<Types.Area> emptyAreas;
+        private ArrayList<Types.Areas> emptyAreas;
 
-        Result(long HeightStrip, Map<Integer, Types.Rectangle> rectangles, ArrayList<Types.Area> emptyAreas) {
+        Result(long HeightStrip, Map<Integer, Types.Rectangle> rectangles, ArrayList<Types.Areas> emptyAreas) {
             this.HeightStrip = HeightStrip;
             this.rectangles = rectangles;
             this.emptyAreas = emptyAreas;
@@ -109,7 +109,7 @@ public class Types {
             return HeightStrip;
         }
 
-        public ArrayList<Types.Area> getEmptyAreas() {
+        public ArrayList<Types.Areas> getEmptyAreas() {
             return emptyAreas;
         }
 
@@ -128,6 +128,55 @@ public class Types {
         }
     }
 
+    static class Rectangles {
+
+        int section;
+        ArrayList<Types.Rectangle> rectangles;
+        ArrayList<Types.Barrier> barriers;
+
+        Rectangles(int section, ArrayList<Types.Rectangle> rectangles, ArrayList<Types.Barrier> barriers) {
+            this.section = section;
+            this.rectangles = rectangles;
+            this.barriers = barriers;
+        }
+
+        public int getSection() {
+            return section;
+        }
+
+        public ArrayList<Types.Rectangle> getRectangles() {
+            return rectangles;
+        }
+
+        public ArrayList<Types.Barrier> getBarriers() {
+            return barriers;
+        }
+    }
+
+    static class Areas {
+
+        int section;
+        ArrayList<Types.Area> areas;
+
+        Areas(int section, ArrayList<Types.Area> areas) {
+            this.section = section;
+            this.areas = areas;
+        }
+
+        public int getSection() {
+            return section;
+        }
+
+        public ArrayList<Types.Area> getAreas() {
+            return areas;
+        }
+
+        public Types.Area getAreasFromSection(int section) {
+                return areas.get(section);
+
+        }
+    }
+
     static class Area implements Cloneable {
 
         private long x;
@@ -140,6 +189,15 @@ public class Types {
             this.y = y;
             this.w = w;
             this.h = h;
+        }
+
+        @Override
+        public String toString() {
+            return
+                    "[" + "x = " + x + ", " +
+                            "y = " + y + ", " +
+                            "w = " + w + ", " +
+                            "h = " + h + "]";
         }
 
         @Override
@@ -239,6 +297,46 @@ public class Types {
 
             copy.removeAll(other.combination);
             return copy.isEmpty();
+        }
+    }
+
+    static class Barrier {
+
+        long x1;
+        long x2;
+        long y;
+
+        Barrier(long x1, long x2, long y) {
+            this.x1 = x1;
+            this.x2 = x2;
+            this.y = y;
+        }
+
+        @Override
+        public String toString() {
+            return "[" + "(" + x1 + "..." + x2 + ")" + ", "+ y + "]";
+        }
+
+        public long getX1() {
+            return x1;
+        }
+
+        public long getX2() {
+            return x2;
+        }
+
+        public long getY() {
+            return y;
+        }
+
+        public void setX1(long x1) {
+            this.x1 = x1;
+        }
+        public void setX2(long x2) {
+            this.x2 = x2;
+        }
+        public void setY(long y) {
+            this.y = y;
         }
     }
 }

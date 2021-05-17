@@ -7,14 +7,12 @@ import java.util.Random;
 
 public class Visualisation extends JPanel {
 
-    static void createFrame(int WidthStrip, int HeightStrip, ArrayList<Types.Rectangle> rectangles, ArrayList<Types.Area> emptyAreas) {
+    static void createFrame(int WidthStrip, int HeightStrip, ArrayList<Types.Rectangle> rectangles) {
 
         Random rand = new Random();
 
         JFrame frame = new JFrame("Draw Rectangles");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        Border redBorder = BorderFactory.createLineBorder(Color.RED);
 
 //        while (RecursPacking.Height < 1200) {
             for (Types.Rectangle element : rectangles) {
