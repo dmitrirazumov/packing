@@ -7,15 +7,15 @@ class RecursPacking {
     public static long endSortingTime1;
     public static long endSortingTime2;
 
+    static long minW = Long.MAX_VALUE;
+
     Types.Result spprg(long WidthStrip, ArrayList<Types.CoupleWH> rectanglesWH, String sorting) {
 
         int wh = 0;
         int section = 0;
         int intermediateW;
 
-        long bx1;
-        long bx2;
-        long by;
+        ArrayList<Types.Combination> combinations;
 
         Map<Integer, Types.Rectangle> rectangles = new HashMap<>();
         ArrayList<Types.Rectangles> sections = new ArrayList<>();
@@ -86,6 +86,7 @@ class RecursPacking {
                 H = H + r.getH();
                 ySection = y;
                 HeightSection = r.getH();
+                if (r.getW() < minW) minW = r.getW();
             } else {
                 rectangles.put(idx, new Types.Rectangle(x, y, r.getH(), r.getW()));
                 newRectangles.add(new Types.Rectangle(x, y, r.getH(), r.getW()));
@@ -96,6 +97,7 @@ class RecursPacking {
                 H = H + r.getW();
                 ySection = y;
                 HeightSection = r.getW();
+                if (r.getH() < minW) minW = r.getH();
             }
 
             newAreas.add(new Types.Area(x, y, w, h));
@@ -120,70 +122,54 @@ class RecursPacking {
             }
 
 
-            //TODO рассчет барьеров
             if (section == 0)
                 recursive_packing(x, y, w, h, 1, ySection, HeightSection, remaining, sorted_indexes, rectangles, newAreas, barriers, newRectangles, null);
             else
                 recursive_packing(x, y, w, h, 1, ySection, HeightSection, remaining, sorted_indexes, rectangles, newAreas, barriers, newRectangles, sections.get(section - 1).getBarriers());
 
-            //TODO формирование вертикальных областей
-            if (newAreas.size() == 1 &&
-                    newAreas.get(0).getX() == x &&
-                    newAreas.get(0).getY() == y &&
-                    newAreas.get(0).getW() == w &&
-                    newAreas.get(0).getH() == h &&
-                    section != 0) {
+            barriers.removeIf(barrier -> barrier.getX1() == barrier.getX2());
 
-                for (Types.Area verticalArea : verticalAreas) {
-                    if (newAreas.get(0).getX() <= verticalArea.getX() &&
-                            (newAreas.get(0).getX() + newAreas.get(0).getW()) >= (verticalArea.getX() + verticalArea.getW()) &&
-                            newAreas.get(0).getY() == (verticalArea.getY() + verticalArea.getH())) {
+            //TODO тестирование формирования вертикальных областей
+            newAreas = new PackingHelper().mergingAreas(newAreas);
 
-                        verticalArea.setX(verticalArea.getX());
-                        verticalArea.setW(verticalArea.getW());
-                        verticalArea.setH(verticalArea.getH() + newAreas.get(0).getH());
-                    }
+            //формирование новых вертикальных областей
+            for (Types.Area area : newAreas) {
+                for (Types.Barrier barrier : barriers) {
+                    if (area.getX() < barrier.getX1() + barrier.getX2() &&
+                            area.getY() == barrier.getY() &&
+                            area.getW() - (WidthStrip - barrier.getX2()) > 0) {
 
-                    if (newAreas.get(0).getX() >= verticalArea.getX() &&
-                            (newAreas.get(0).getX() + newAreas.get(0).getW()) <= (verticalArea.getX() + verticalArea.getW()) &&
-                            newAreas.get(0).getY() == (verticalArea.getY() + verticalArea.getH())) {
-
-                        verticalArea.setX(newAreas.get(0).getX());
-                        verticalArea.setW(newAreas.get(0).getW());
-                        verticalArea.setH(verticalArea.getH() + newAreas.get(0).getH());
-                    }
-                }
-
-                for (int i = 0; i < areas.get(section - 1).getAreas().size(); i++) {
-                    if (newAreas.get(0).getX() <= areas.get(section - 1).getAreas().get(i).getX() &&
-                            (newAreas.get(0).getX() + newAreas.get(0).getW()) >= (areas.get(section - 1).getAreas().get(i).getX() + areas.get(section - 1).getAreas().get(i).getW()) &&
-                            newAreas.get(0).getY() == (areas.get(section - 1).getAreas().get(i).getY() + areas.get(section - 1).getAreas().get(i).getH())) {
-
-                        Types.Area newVerticalArea = new Types.Area(
-                                areas.get(section - 1).getAreas().get(i).getX(),
-                                areas.get(section - 1).getAreas().get(i).getY(),
-                                areas.get(section - 1).getAreas().get(i).getW(),
-                                newAreas.get(0).getH() + areas.get(section - 1).getAreas().get(i).getH());
-
-                        if (!verticalAreas.contains(newVerticalArea)) verticalAreas.add(newVerticalArea);
-                    }
-
-                    if (newAreas.get(0).getX() >= areas.get(section - 1).getAreas().get(i).getX() &&
-                            (newAreas.get(0).getX() + newAreas.get(0).getW()) <= (areas.get(section - 1).getAreas().get(i).getX() + areas.get(section - 1).getAreas().get(i).getW()) &&
-                            newAreas.get(0).getY() == (areas.get(section - 1).getAreas().get(i).getY() + areas.get(section - 1).getAreas().get(i).getH())) {
-
-                        Types.Area newVerticalArea = new Types.Area(
-                                newAreas.get(0).getX(),
-                                areas.get(section - 1).getAreas().get(i).getY(),
-                                newAreas.get(0).getW(),
-                                newAreas.get(0).getH() + areas.get(section - 1).getAreas().get(i).getH());
-
-                        if (!verticalAreas.contains(newVerticalArea)) verticalAreas.add(newVerticalArea);
+                        verticalAreas.add(new Types.Area(area.getX(), area.getY(), area.getW(), area.getH()));
+                        verticalAreas.add(new Types.Area(area.getX(), area.getY(), area.getW() - (WidthStrip - barrier.getX2()), area.getH()));
                     }
                 }
             }
 
-            if (newAreas.size() > 1) newAreas = new PackingHelper().mergingAreas(newAreas);
+            //объединение вертикальных областей
+            if (section != 0) {
+                for (Types.Area newArea : newAreas) {
+                    for (Types.Area verticalArea : verticalAreas) {
+                        if (newArea.getX() <= verticalArea.getX() &&
+                                newArea.getX() + newArea.getW() >= verticalArea.getX() + verticalArea.getW() &&
+                                newArea.getY() == verticalArea.getY() + verticalArea.getH() &&
+                                verticalArea.getX() >= newRectangles.get(0).getX() + newRectangles.get(0).getW()) {
+
+                            verticalArea.setX(verticalArea.getX());
+                            verticalArea.setW(verticalArea.getW());
+                            verticalArea.setH(verticalArea.getH() + newArea.getH());
+                        }
+                        if (newArea.getX() >= verticalArea.getX() &&
+                                newArea.getX() + newArea.getW() <= verticalArea.getX() + verticalArea.getW() &&
+                                newArea.getY() == verticalArea.getY() + verticalArea.getH() &&
+                                verticalArea.getX() >= newRectangles.get(0).getY() + newRectangles.get(0).getH()) {
+
+                            verticalArea.setX(newArea.getX());
+                            verticalArea.setW(newArea.getW());
+                            verticalArea.setH(verticalArea.getH() + newArea.getH());
+                        }
+                    }
+                }
+            }
 
             areas.add(new Types.Areas(section, new ArrayList<>(newAreas)));
             sections.add(new Types.Rectangles(section, new ArrayList<>(newRectangles), new ArrayList<>(barriers)));
@@ -199,16 +185,39 @@ class RecursPacking {
             section++;
             Height = H;
         }
+        System.out.println("");
+
+        //если есть область, ширина которой меньше минимальной ширины элемента, то ее следует удалить, так как в нее не поместится ни один элемент
+        verticalAreas.removeIf(verticalArea -> verticalArea.getW() < minW);
 
 //        ArrayList<Types.Area> mon = new ArrayList<>(verticalAreas);
-//        Comparator<Types.Area> c = Collections.reverseOrder(new Types.sortAreasByHeight());
+//        Comparator<Types.Area> c = Collections.reverseOrder(new Types.sortAreasByWeight());
 //        mon.sort(c);
-//        System.out.println(mon);
+
+        //TODO тестирование формирования комбинаций
+        combinations = new PackingHelper().combinationsOfAreas(verticalAreas);
+
+        System.out.println("Количество вертикальных областей = " + verticalAreas.size());
+        for (int i = 0; i < verticalAreas.size(); i++) {
+            System.out.println("Вертикальная область " + i + ": " + verticalAreas.get(i));
+        }
+
+        System.out.println("");
+
+        System.out.println("Количество комбинаций = " + combinations.size());
+        for (int i = 0; i < combinations.size(); i++) {
+            System.out.println("Комбинация " + i + ": " + combinations.get(i));
+        }
+
+        System.out.println("");
+
 //        System.out.println(mon.get(0).getX() + ", " + mon.get(0).getY() + ", " + mon.get(0).getW() + ", " + mon.get(0).getH());
-//        System.out.println(mon.size());
+        System.out.println("");
+        System.out.println("Количество вертикальных областей = " + verticalAreas.size());
 //        for (Types.Rectangles s : sections) {
 //            System.out.println("Секция " + s.getSection() + ": " + s.getRectangles());
 //        }
+        System.out.println(minW);
         return new Types.Result(y, rectangles, areas);
     }
 
@@ -218,7 +227,6 @@ class RecursPacking {
 
         int lastBarrier = barriers.size() - 1;
         int lastArea = newAreas.size() - 1;
-        int lastRectangle = newRectangles.size() - 1;
 
         int priority = 6;
         int orientation = 0;
@@ -274,11 +282,10 @@ class RecursPacking {
                 d = remaining.get(best).getW();
             }
 
+            if (psi < minW) minW = psi;
             result.put(best, new Types.Rectangle(x, y, psi, d));
             newRectangles.add(new Types.Rectangle(x, y, psi, d));
             indexes.remove(new Integer(best));
-
-            lastRectangle = newRectangles.size() - 1;
 
             if ((ySection + HeightSection) == (y + d)) barriers.add(new Types.Barrier(x, x + psi, y + d));
             lastBarrier = barriers.size() - 1;
@@ -293,14 +300,15 @@ class RecursPacking {
                 newAreas.add(new Types.Area(x, y + d, w, h - d));
                 barriers.add(new Types.Barrier(x, x + w, y + d));
                 lastBarrier = barriers.size() - 1;
-                barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                 recursive_packing(x, y + d, w, h - d, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
             } else if (priority == 3) {
                 newAreas.add(new Types.Area(x + psi, y, w - psi, h));
                 barriers.add(new Types.Barrier(x + psi, (x + psi) + (w - psi), y));
                 lastBarrier = barriers.size() - 1;
-                barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                 recursive_packing(x + psi, y, w - psi, h, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
+
             } else if (priority == 4) {
 
                 min_w = Long.MAX_VALUE;
@@ -318,55 +326,85 @@ class RecursPacking {
                     newAreas.add(new Types.Area(x + psi, y, w - psi, d));
                     barriers.add(new Types.Barrier(x + psi, (x + psi) + (w - psi), y));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     newAreas.add(new Types.Area(x, y + d, w, h - d));
                     barriers.add(new Types.Barrier(x, x + psi, y + d));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     recursive_packing(x, y + d, w, h - d, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
+
+                    if (barriers.get(lastBarrier).getX1() == newAreas.get(lastArea).getX() &&
+                            barriers.get(lastBarrier).getX2() == newAreas.get(lastArea).getX() + newAreas.get(lastArea).getW() &&
+                            barriers.get(lastBarrier).getY() == newAreas.get(lastArea).getY() + newAreas.get(lastArea).getH()) {
+                        barriers.get(lastBarrier).setX1(0);
+                        barriers.get(lastBarrier).setX2(0);
+                        barriers.get(lastBarrier).setY(0);
+                    }
                 } else if ((h - d) < min_h) {
                     newAreas.add(new Types.Area(x, y + d, psi, h - d));
                     barriers.add(new Types.Barrier(x, x + psi, y + d));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     newAreas.add(new Types.Area(x + psi, y, w - psi, h));
                     barriers.add(new Types.Barrier(x + psi, (x + psi) + (w - psi), y));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     recursive_packing(x + psi, y, w - psi, h, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
+
+                    if (barriers.get(lastBarrier).getX1() == newAreas.get(lastArea).getX() &&
+                            barriers.get(lastBarrier).getX2() == newAreas.get(lastArea).getX() + newAreas.get(lastArea).getW() &&
+                            barriers.get(lastBarrier).getY() == newAreas.get(lastArea).getY() + newAreas.get(lastArea).getH()) {
+                        barriers.get(lastBarrier).setX1(0);
+                        barriers.get(lastBarrier).setX2(0);
+                        barriers.get(lastBarrier).setY(0);
+                    }
                 } else if (psi < min_w) {
                     newAreas.add(new Types.Area(x + psi, y, w - psi, d));
                     barriers.add(new Types.Barrier(x + psi, (x + psi) + (w - psi), y));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     recursive_packing(x + psi, y, w - psi, d, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
                     newAreas.add(new Types.Area(x, y + d, w, h - d));
                     barriers.add(new Types.Barrier(x, x + psi, y + d));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     recursive_packing(x, y + d, w, h - d, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
+
+                    if (barriers.get(lastBarrier).getX1() == newAreas.get(lastArea).getX() &&
+                            barriers.get(lastBarrier).getX2() == newAreas.get(lastArea).getX() + newAreas.get(lastArea).getW() &&
+                            barriers.get(lastBarrier).getY() == newAreas.get(lastArea).getY() + newAreas.get(lastArea).getH()) {
+                        barriers.get(lastBarrier).setX1(0);
+                        barriers.get(lastBarrier).setX2(0);
+                        barriers.get(lastBarrier).setY(0);
+                    }
                 } else {
                     newAreas.add(new Types.Area(x, y + d, psi, h - d));
                     barriers.add(new Types.Barrier(x, x + psi, y + d));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     recursive_packing(x, y + d, psi, h - d, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
                     newAreas.add(new Types.Area(x + psi, y, w - psi, h));
                     barriers.add(new Types.Barrier(x + psi, (x + psi) + (w - psi), y));
                     lastBarrier = barriers.size() - 1;
-                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection, newRectangles.get(lastRectangle));
+                    barriers = barriersCheck(barriers, prevBarriers, lastBarrier, ySection);
                     recursive_packing(x + psi, y, w - psi, h, wh, ySection, HeightSection, remaining, indexes, result, newAreas, barriers, newRectangles, prevBarriers);
+
+                    if (barriers.get(lastBarrier).getX1() == newAreas.get(lastArea).getX() &&
+                            barriers.get(lastBarrier).getX2() == newAreas.get(lastArea).getX() + newAreas.get(lastArea).getW() &&
+                            barriers.get(lastBarrier).getY() == newAreas.get(lastArea).getY() + newAreas.get(lastArea).getH()) {
+                        barriers.get(lastBarrier).setX1(0);
+                        barriers.get(lastBarrier).setX2(0);
+                        barriers.get(lastBarrier).setY(0);
+                    }
                 }
             }
 
         }
     }
 
-    ArrayList<Types.Barrier> barriersCheck(ArrayList<Types.Barrier> barriers, ArrayList<Types.Barrier> prevBarriers,
-                                           int lastBarrier, long ySection, Types.Rectangle lastRectanle) {
-
-        boolean crossingWithRectangle = false;
-        int crossingWithNewRectangles = 0;
+    ArrayList<Types.Barrier> barriersCheck
+            (ArrayList<Types.Barrier> barriers, ArrayList<Types.Barrier> prevBarriers,
+             int lastBarrier, long ySection) {
 
         Types.Barrier intermediateBarrier = new Types.Barrier(
                 barriers.get(lastBarrier).getX1(),
@@ -388,14 +426,6 @@ class RecursPacking {
                     barriers.get(lastBarrier).setX2(prevBarrier.getX2());
                 }
 
-                //проверка на то, равен ли барьер верхней границе прямоугольника из другой секции
-                //если да, то барьер не может быть удален, так как как с него может начинаться область при условии,
-                //что на данный барьер не был поставлен прямоугольник
-//                if (barriers.get(lastBarrier).getX1() == prevBarrier.getX1() &&
-//                        barriers.get(lastBarrier).getX2() == prevBarrier.getX2() &&
-//                        barriers.get(lastBarrier).getY() == prevBarrier.getY()) {
-//                    crossingWithRectangle = true;
-//                }
             }
 
             //отсечение барьера, если он не лежит на прямоугольнике из другой секции
@@ -403,7 +433,7 @@ class RecursPacking {
                     intermediateBarrier.getX2() == barriers.get(lastBarrier).getX2() &&
                     intermediateBarrier.getY() == barriers.get(lastBarrier).getY() &&
                     ySection == barriers.get(lastBarrier).getY()
-                    ) {
+            ) {
                 barriers.get(lastBarrier).setX1(0);
                 barriers.get(lastBarrier).setX2(0);
                 barriers.get(lastBarrier).setY(0);

@@ -264,11 +264,19 @@ public class Types {
         }
     }
 
-    static class sortAreasByHeight implements Comparator<Area> {
+//    static class sortAreasByHeight implements Comparator<Area> {
+//
+//        @Override
+//        public int compare(Area o1, Area o2) {
+//            return (int) (o1.h - o2.h);
+//        }
+//    }
+
+    static class sortAreasByWeight implements Comparator<Area> {
 
         @Override
         public int compare(Area o1, Area o2) {
-            return (int) (o1.h - o2.h);
+            return (int) (o1.w - o2.w);
         }
     }
 
@@ -297,6 +305,10 @@ public class Types {
 
             copy.removeAll(other.combination);
             return copy.isEmpty();
+        }
+
+        public ArrayList<Integer> getCombination() {
+            return combination;
         }
     }
 

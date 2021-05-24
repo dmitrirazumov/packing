@@ -71,35 +71,35 @@ public class PackingHelper {
                     if (!areas.contains(newArea)) areas.add(newArea);
                 }
 
-//                //Vertical 1
-//                if ((areas.get(i).getX() <= areas.get(j).getX()) &&
-//                        ((areas.get(i).getX() + areas.get(i).getW()) >= (areas.get(j).getX() + areas.get(j).getW())) &&
-//                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
-//
-//                    Types.Area newArea = new Types.Area(
-//                            areas.get(j).getX(),
-//                            areas.get(i).getY(),
-//                            areas.get(j).getW(),
-//                            areas.get(i).getH() + areas.get(j).getH()
-//                    );
-//
-//                    if (!areas.contains(newArea)) areas.add(newArea);
-//                }
-//
-//                //Vertical 2
-//                if ((areas.get(i).getX() >= areas.get(j).getX()) &&
-//                        ((areas.get(i).getX() + areas.get(i).getW()) <= (areas.get(j).getX() + areas.get(j).getW())) &&
-//                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
-//
-//                    Types.Area newArea = new Types.Area(
-//                            areas.get(i).getX(),
-//                            areas.get(i).getY(),
-//                            areas.get(i).getW(),
-//                            areas.get(i).getH() + areas.get(j).getH()
-//                    );
-//
-//                    if (!areas.contains(newArea)) areas.add(newArea);
-//                }
+                //Vertical 1
+                if ((areas.get(i).getX() <= areas.get(j).getX()) &&
+                        ((areas.get(i).getX() + areas.get(i).getW()) >= (areas.get(j).getX() + areas.get(j).getW())) &&
+                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
+
+                    Types.Area newArea = new Types.Area(
+                            areas.get(j).getX(),
+                            areas.get(i).getY(),
+                            areas.get(j).getW(),
+                            areas.get(i).getH() + areas.get(j).getH()
+                    );
+
+                    if (!areas.contains(newArea)) areas.add(newArea);
+                }
+
+                //Vertical 2
+                if ((areas.get(i).getX() >= areas.get(j).getX()) &&
+                        ((areas.get(i).getX() + areas.get(i).getW()) <= (areas.get(j).getX() + areas.get(j).getW())) &&
+                        (areas.get(j).getY() == (areas.get(i).getY() + areas.get(i).getH()))) {
+
+                    Types.Area newArea = new Types.Area(
+                            areas.get(i).getX(),
+                            areas.get(i).getY(),
+                            areas.get(i).getW(),
+                            areas.get(i).getH() + areas.get(j).getH()
+                    );
+
+                    if (!areas.contains(newArea)) areas.add(newArea);
+                }
             }
         }
 
@@ -119,12 +119,13 @@ public class PackingHelper {
         ArrayList<Types.Area> candidates = new ArrayList<>();
 
         ArrayList<Types.Area> copy = new ArrayList<>(areas);
-        Comparator<Types.Area> c = Collections.reverseOrder(new Types.sortAreasByHeight());
+        Comparator<Types.Area> c = Collections.reverseOrder(new Types.sortAreasByWeight());
         copy.sort(c);
 
         for (Types.Area element : copy) {
             sortedAreas.add(areas.indexOf(element));
         }
+
 
         do {
             if (candidates.isEmpty()) {
@@ -162,7 +163,7 @@ public class PackingHelper {
                 combination.clear();
             }
 
-        } while (!sortedAreas.isEmpty() && STEPS < 5);
+        } while (!sortedAreas.isEmpty() && STEPS < 50);
 
         return combinations;
 
@@ -182,5 +183,15 @@ public class PackingHelper {
         }
 
         return candidates;
+    }
+
+    Types.Result updatingTape(Types.Result result, ArrayList<Types.Rectangles> sections, ArrayList<Types.Area> verticalAreas, ArrayList<Types.Combination> combinations) {
+
+
+        for (Types.Combination combination : combinations) {
+
+        }
+
+        return result;
     }
 }

@@ -68,8 +68,6 @@ public class Main {
 //        boxes.add(new Types.CoupleWH(50, 30));
 //        boxes.add(new Types.CoupleWH(50, 30));
 //        boxes.add(new Types.CoupleWH(20, 40));
-//        boxes.add(new Types.CoupleWH(250, 80));
-//        boxes.add(new Types.CoupleWH(250, 80));
 //        boxes.add(new Types.CoupleWH(100, 200));
 //        boxes.add(new Types.CoupleWH(200, 100));
 //        boxes.add(new Types.CoupleWH(50, 50));
@@ -80,7 +78,6 @@ public class Main {
 //        boxes.add(new Types.CoupleWH(50, 50));
 //        boxes.add(new Types.CoupleWH(100, 100));
 //        boxes.add(new Types.CoupleWH(100, 50));
-//        boxes.add(new Types.CoupleWH(250, 80));
 //        boxes.add(new Types.CoupleWH(250, 80));
 //        boxes.add(new Types.CoupleWH(100, 200));
 //        boxes.add(new Types.CoupleWH(200, 100));
@@ -93,8 +90,8 @@ public class Main {
 //        boxes.add(new Types.CoupleWH(100, 50));
 
 //        boxes.add(new Types.CoupleWH(50, 30));
-//        boxes.add(new Types.CoupleWH(250, 80));
-//        boxes.add(new Types.CoupleWH(250, 80));
+//        boxes.add(new Types.CoupleWH(230, 80));
+//        boxes.add(new Types.CoupleWH(230, 80));
 //        boxes.add(new Types.CoupleWH(100, 200));
 //        boxes.add(new Types.CoupleWH(100, 200));
 //        boxes.add(new Types.CoupleWH(80, 40));
@@ -173,16 +170,14 @@ public class Main {
         HeightStrip = result.getHeightStrip();
         rectangles = result.getRectanglesWithoutId();
         emptyAreas = result.getEmptyAreas();
+        ArrayList<Types.Area> areas = new ArrayList<>();
 //        emptyAreas = new PackingHelper().mergingAreas(emptyAreas);
-//
-//        ArrayList<Types.Combination> combinations = new PackingHelper().combinationsOfAreas(emptyAreas);
-//
-//        for (int i = 0; i < combinations.size(); i++) {
-//            System.out.println("Комбинация " + i + ": " + combinations.get(i));
-//            }
-//        System.out.println("");
 
+        for (Types.Areas areas1: emptyAreas) {
+            areas.addAll(areas1.getAreas());
+        }
 
+        System.out.println("Количество всех областей = " + areas.size());
 
 //        ArrayList<Types.Area> sortedAreas = new PackingHelper().combinationsOfAreas(emptyAreas);
 //
@@ -213,17 +208,15 @@ public class Main {
 //        rectangles.get(4).setX(0);
 //        rectangles.get(4).setY(570);
 
-        for (int i = 0; i < rectangles.size(); i++) {
-            System.out.println("Координаты для " + i + " прямоугольника: " + rectangles.get(i).getX() + ", " + rectangles.get(i).getY());
-        }
-
-        System.out.println("");
-
-        for (Types.Areas emptyArea : emptyAreas) {
-            System.out.println("Пустые области в секции " + emptyArea.getSection() + ": " + emptyArea.getAreas());
-        }
-
-        System.out.println("");
+//        for (int i = 0; i < rectangles.size(); i++) {
+//            System.out.println("Координаты для " + i + " прямоугольника: " + rectangles.get(i).getX() + ", " + rectangles.get(i).getY());
+//        }
+//
+//        System.out.println("");
+//
+//        for (Types.Areas emptyArea : emptyAreas) {
+//            System.out.println("Пустые области в секции " + emptyArea.getSection() + ": " + emptyArea.getAreas());
+//        }
 
         final long endTime = System.currentTimeMillis();
 
