@@ -36,7 +36,7 @@ public class Visualisation extends JPanel {
                         Font font = new Font("Arial", Font.BOLD, 12);
                         g2.setFont(font);
                         g2.setColor(Color.BLACK);
-                        g2.drawString(Integer.toString(rectangles.indexOf(element)), element.getX() + element.getW() / 2, element.getY() + element.getH() / 2);
+                        g2.drawString(Integer.toString(element.getId()), element.getX() + element.getW() / 2, element.getY() + element.getH() / 2);
                     }
                 });
 

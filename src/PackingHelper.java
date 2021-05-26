@@ -187,11 +187,29 @@ public class PackingHelper {
 
     Types.Result updatingTape(Types.Result result, ArrayList<Types.Rectangles> sections, ArrayList<Types.Area> verticalAreas, ArrayList<Types.Combination> combinations) {
 
+        Types.Rectangles lastSection = sections.get(sections.size() - 1);
+        ArrayList<Types.Result> results = new ArrayList<>();
+
+        results.add(result);
 
         for (Types.Combination combination : combinations) {
 
+            putBiggest(results.get(0), lastSection, verticalAreas, combination);
         }
 
         return result;
+    }
+
+    void putBiggest(Types.Result result, Types.Rectangles lastSection, ArrayList<Types.Area> verticalAreas, Types.Combination combination) {
+
+        for (int i = 0; i < combination.getCombination().size(); i++) {
+            if (lastSection.getRectangles().get(0).getW() <= verticalAreas.get(i).getW() &&
+                    lastSection.getRectangles().get(0).getH() <= verticalAreas.get(i).getH()) {
+
+            } else if (lastSection.getRectangles().get(0).getH() <= verticalAreas.get(i).getW() &&
+                    lastSection.getRectangles().get(0).getW() <= verticalAreas.get(i).getH()) {
+
+            }
+        }
     }
 }

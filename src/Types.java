@@ -47,12 +47,14 @@ public class Types {
 
     static class Rectangle {
 
+        private int id;
         private long x;
         private long y;
         private long w;
         private long h;
 
-        Rectangle(long x, long y, long w, long h) {
+        Rectangle(int id, long x, long y, long w, long h) {
+            this.id = id;
             this.x = x;
             this.y = y;
             this.w = w;
@@ -91,18 +93,33 @@ public class Types {
         public void setH(long h) {
             this.h = h;
         }
+
+        public int getId() {
+            return id;
+        }
     }
 
     static class Result {
 
         private long HeightStrip;
-        private Map<Integer, Rectangle> rectangles;
+        private Map<Integer, ArrayList<Types.Rectangle>> rectangles;
         private ArrayList<Types.Areas> emptyAreas;
 
-        Result(long HeightStrip, Map<Integer, Types.Rectangle> rectangles, ArrayList<Types.Areas> emptyAreas) {
+        Result(long HeightStrip, Map<Integer, ArrayList<Types.Rectangle>> rectangles, ArrayList<Types.Areas> emptyAreas) {
             this.HeightStrip = HeightStrip;
             this.rectangles = rectangles;
             this.emptyAreas = emptyAreas;
+        }
+
+        public ArrayList<Types.Rectangle> getRectangles() {
+
+            ArrayList<Types.Rectangle> getRectangles = new ArrayList<>();
+
+            for (Map.Entry<Integer, ArrayList<Types.Rectangle>> item : rectangles.entrySet()){
+                getRectangles.addAll(item.getValue());
+            }
+
+            return getRectangles;
         }
 
         public long getHeightStrip() {
@@ -113,18 +130,16 @@ public class Types {
             return emptyAreas;
         }
 
-        public Map<Integer, Types.Rectangle> getRectangles() {
-            return rectangles;
-        }
+    }
 
-        public ArrayList<Rectangle> getRectanglesWithoutId() {
-            ArrayList<Rectangle> rects = new ArrayList<>();
+    static class Section {
 
-            for (int i = 0; i < rectangles.size(); i++) {
-                rects.add(rectangles.get(i));
-            }
+        int number;
+        ArrayList<Types.Rectangle> rectangles;
 
-            return rects;
+        Section(int number, ArrayList<Types.Rectangle> rectangles) {
+            this.number = number;
+            this.rectangles = rectangles;
         }
     }
 
