@@ -111,6 +111,10 @@ public class Types {
             this.emptyAreas = emptyAreas;
         }
 
+        public Map<Integer, ArrayList<Types.Rectangle>> getMapRectangles() {
+            return rectangles;
+        }
+
         public ArrayList<Types.Rectangle> getRectangles() {
 
             ArrayList<Types.Rectangle> getRectangles = new ArrayList<>();
@@ -324,6 +328,98 @@ public class Types {
 
         public ArrayList<Integer> getCombination() {
             return combination;
+        }
+    }
+
+    static class BiggestVerticalArea {
+
+        boolean placed;
+        ArrayList<BVAreas> areas;
+        ArrayList<Types.Rectangle> rectangles;
+        long rectanglesHeight;
+
+        BiggestVerticalArea(boolean placed, ArrayList<BVAreas> areas, ArrayList<Types.Rectangle> rectangles, long rectanglesHeight) {
+            this.placed = placed;
+            this.areas = areas;
+            this.rectangles = rectangles;
+            this.rectanglesHeight = rectanglesHeight;
+        }
+
+        public ArrayList<BVAreas> getAreas() {
+            return areas;
+        }
+
+        public ArrayList<Types.Rectangle> getRectangles() {
+            return rectangles;
+        }
+
+        public int getLastNumberOfPut() {
+
+            int lastNop = 0;
+            for (Types.BVAreas area: areas) {
+                if (lastNop < area.getNumberOfPut()) lastNop = area.getNumberOfPut();
+            }
+
+            return lastNop;
+        }
+    }
+
+    static class BVAreas {
+
+        long x;
+        long y;
+        long w;
+        long h;
+        int numberOfPut;
+        int variation;
+
+        BVAreas(long x, long y, long w, long h, int numberOfPut, int variation) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.numberOfPut = numberOfPut;
+            this.variation = variation;
+        }
+
+        public long getX() {
+            return x;
+        }
+
+        public void setX(long x) {
+            this.x = x;
+        }
+
+        public long getY() {
+            return y;
+        }
+
+        public void setY(long y) {
+            this.y = y;
+        }
+
+        public long getW() {
+            return w;
+        }
+
+        public void setW(long w) {
+            this.w = w;
+        }
+
+        public long getH() {
+            return h;
+        }
+
+        public void setH(long h) {
+            this.h = h;
+        }
+
+        public int getNumberOfPut() {
+            return numberOfPut;
+        }
+
+        public int getVariation() {
+            return variation;
         }
     }
 

@@ -215,6 +215,9 @@ class RecursPacking {
 //            System.out.println("Секция " + s.getSection() + ": " + s.getRectangles());
 //        }
 
+        Types.Result result = new Types.Result(y, rectangles, areas);
+  //      result = new PackingHelper().updatingTape(result, sections, verticalAreas, combinations);
+
         return new Types.Result(y, rectangles, areas);
     }
 
