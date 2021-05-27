@@ -130,10 +130,22 @@ public class Types {
             return HeightStrip;
         }
 
+        public void setHeightStrip(long HeightStrip) {
+            this.HeightStrip = HeightStrip;
+        }
+
         public ArrayList<Types.Areas> getEmptyAreas() {
             return emptyAreas;
         }
 
+    }
+
+    static class sortResults implements Comparator<Result> {
+
+        @Override
+        public int compare(Result o1, Result o2) {
+            return (int) (o1.HeightStrip - o2.HeightStrip);
+        }
     }
 
     static class Section {

@@ -216,9 +216,9 @@ class RecursPacking {
 //        }
 
         Types.Result result = new Types.Result(y, rectangles, areas);
-  //      result = new PackingHelper().updatingTape(result, sections, verticalAreas, combinations);
+        result = new PackingHelper().updatingTape(result, sections, verticalAreas, combinations);
 
-        return new Types.Result(y, rectangles, areas);
+        return result;
     }
 
     private void recursive_packing(long x, long y, long w, long h, int wh, long ySection, long HeightSection,

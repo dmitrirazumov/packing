@@ -190,9 +190,9 @@ public class PackingHelper {
         long newHeight;
         Types.BiggestVerticalArea biggestVerticalArea;
 
-        int lastSection = sections.size() - 1;
+        int lastSection = result.getMapRectangles().size() - 1;
         long heightStrip = result.getHeightStrip();
-        Types.Rectangle lastRectangle = sections.get(lastSection).getRectangles().get(0);
+        Types.Rectangle lastRectangle = result.getMapRectangles().get(lastSection).get(0);
 
         ArrayList<Types.Result> results = new ArrayList<>();
         results.add(result);
@@ -203,26 +203,29 @@ public class PackingHelper {
             if (biggestVerticalArea != null) {
 
                 results.add(new Types.Result(result.getHeightStrip(), result.getMapRectangles(), result.getEmptyAreas()));
-                newHeight = calculateNewHeight(heightStrip, biggestVerticalArea, lastRectangle);
+                heightStrip = heightStrip - lastRectangle.getH();
+//                newHeight = calculateNewHeight(heightStrip, biggestVerticalArea, lastRectangle);
 
                 do {
-                    biggestVerticalArea = fillBiggestArea(biggestVerticalArea, lastRectangle);
-                    if (!biggestVerticalArea.placed) break;
                     newHeight = calculateNewHeight(heightStrip, biggestVerticalArea, lastRectangle);
-                    sections.remove(lastSection);
-                    lastSection = sections.size() - 1;
-                    lastRectangle = sections.get(lastSection).getRectangles().get(0);
+                    biggestVerticalArea = fillBiggestArea(results.get(results.size() - 1), biggestVerticalArea, lastRectangle);
+                    if (!biggestVerticalArea.placed) break;
+                    lastSection = lastSection - 1;
+                    lastRectangle = result.getMapRectangles().get(lastSection).get(0);
 
                 } while (biggestVerticalArea.placed);
 
+                results.get(results.size() - 1).setHeightStrip(newHeight);
             }
 
         }
 
-        return result;
+        results.sort(new Types.sortResults());
+
+        return results.get(0);
     }
 
-    Types.BiggestVerticalArea fillBiggestArea(Types.BiggestVerticalArea biggestVerticalArea, Types.Rectangle rectangle) {
+    Types.BiggestVerticalArea fillBiggestArea(Types.Result result, Types.BiggestVerticalArea biggestVerticalArea, Types.Rectangle rectangle) {
 
         int lastNop = biggestVerticalArea.getLastNumberOfPut();
         ArrayList<Types.BVAreas> newBVAreas = new ArrayList<>();
@@ -233,10 +236,8 @@ public class PackingHelper {
                     (rectangle.getH() <= biggestVerticalArea.getAreas().get(i).getW() && rectangle.getW() <= biggestVerticalArea.getAreas().get(i).getH())) {
 
                 //TODO изменение в результате
-                putRectangleInNewPosition(biggestVerticalArea.getAreas().get(i), rectangle);
+                putRectangleInNewPosition(result, biggestVerticalArea.getAreas().get(i), rectangle);
                 biggestVerticalArea.placed = true;
-
-                biggestVerticalArea.getRectangles().add(rectangle);
 
                 //Init Variation 0
                 if (biggestVerticalArea.getAreas().get(i).getVariation() == 0) {
@@ -259,6 +260,8 @@ public class PackingHelper {
 
                 //Variation 1
                 else if (biggestVerticalArea.getAreas().get(i).getVariation() == 1) {
+
+                    biggestVerticalArea.getRectangles().add(rectangle);
 
                     final int NOP = biggestVerticalArea.getAreas().get(i).getNumberOfPut();
                     biggestVerticalArea.getAreas().removeIf(bvArea -> bvArea.getNumberOfPut() == NOP && bvArea.getVariation() == 2);
@@ -296,6 +299,8 @@ public class PackingHelper {
                 //Variation 2
                 else if (biggestVerticalArea.getAreas().get(i).getVariation() == 2) {
 
+                    biggestVerticalArea.getRectangles().add(rectangle);
+
                     final int NOP = biggestVerticalArea.getAreas().get(i).getNumberOfPut();
                     biggestVerticalArea.getAreas().removeIf(bvArea -> bvArea.getNumberOfPut() == NOP &&
                             (bvArea.getVariation() == 1 || bvArea.getVariation() == 2 || bvArea.getVariation() == 4));
@@ -327,6 +332,8 @@ public class PackingHelper {
                 //Variation 3
                 else if (biggestVerticalArea.getAreas().get(i).getVariation() == 3) {
 
+                    biggestVerticalArea.getRectangles().add(rectangle);
+
                     final int NOP = biggestVerticalArea.getAreas().get(i).getNumberOfPut();
                     biggestVerticalArea.getAreas().removeIf(bvArea -> bvArea.getNumberOfPut() == NOP &&
                             (bvArea.getVariation() == 3 || bvArea.getVariation() == 4));
@@ -357,6 +364,8 @@ public class PackingHelper {
 
                 //Variation 4
                 else if (biggestVerticalArea.getAreas().get(i).getVariation() == 4) {
+
+                    biggestVerticalArea.getRectangles().add(rectangle);
 
                     final int NOP = biggestVerticalArea.getAreas().get(i).getNumberOfPut();
                     biggestVerticalArea.getAreas().removeIf(bvArea -> bvArea.getNumberOfPut() == NOP &&
@@ -422,7 +431,7 @@ public class PackingHelper {
 
     long calculateNewHeight(long heightStrip, Types.BiggestVerticalArea biggestVerticalArea, Types.Rectangle rectangle) {
 
-        long newHeight = heightStrip - rectangle.getH();
+        long newHeight = heightStrip;
         long check = biggestVerticalArea.rectanglesHeight;
 
         if (newHeight < check) newHeight = check;
@@ -430,7 +439,7 @@ public class PackingHelper {
         return newHeight;
     }
 
-    void putRectangleInNewPosition(Types.BVAreas area, Types.Rectangle rectangle) {
+    void putRectangleInNewPosition(Types.Result result, Types.BVAreas area, Types.Rectangle rectangle) {
 
         long intermediateW;
 
@@ -458,7 +467,7 @@ public class PackingHelper {
                 bvAreas.add(new Types.BVAreas(verticalAreas.get(combination.getCombination().get(i)).getX(), verticalAreas.get(combination.getCombination().get(i)).getY(),
                         verticalAreas.get(combination.getCombination().get(i)).getW(), verticalAreas.get(combination.getCombination().get(i)).getH(), 0, 0));
 
-                biggestVerticalArea = new Types.BiggestVerticalArea(true, bvAreas, rectangles, verticalAreas.get(combination.getCombination().get(i)).getY() + rectangle.getH());
+                biggestVerticalArea = new Types.BiggestVerticalArea(true, new ArrayList<>(bvAreas), new ArrayList<>(rectangles), verticalAreas.get(combination.getCombination().get(i)).getY() + rectangle.getH());
                 rectangles.clear();
                 bvAreas.clear();
 
@@ -471,7 +480,7 @@ public class PackingHelper {
                 bvAreas.add(new Types.BVAreas(verticalAreas.get(combination.getCombination().get(i)).getX(), verticalAreas.get(combination.getCombination().get(i)).getY(),
                         verticalAreas.get(combination.getCombination().get(i)).getW(), verticalAreas.get(combination.getCombination().get(i)).getH(), 0, 0));
 
-                biggestVerticalArea = new Types.BiggestVerticalArea(true, bvAreas, rectangles, verticalAreas.get(combination.getCombination().get(i)).getY() + rectangle.getW());
+                biggestVerticalArea = new Types.BiggestVerticalArea(true, new ArrayList<>(bvAreas), new ArrayList<>(rectangles), verticalAreas.get(combination.getCombination().get(i)).getY() + rectangle.getW());
                 rectangles.clear();
                 bvAreas.clear();
 

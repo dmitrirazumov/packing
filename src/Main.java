@@ -65,22 +65,27 @@ public class Main {
 //        boxes.add(new Types.CoupleWH(100, 200));
 //        boxes.add(new Types.CoupleWH(100, 200));
 
-        boxes.add(new Types.CoupleWH(50, 30));
-        boxes.add(new Types.CoupleWH(50, 30));
-        boxes.add(new Types.CoupleWH(20, 40));
         boxes.add(new Types.CoupleWH(100, 200));
-        boxes.add(new Types.CoupleWH(200, 100));
-        boxes.add(new Types.CoupleWH(50, 50));
-        boxes.add(new Types.CoupleWH(50, 50));
         boxes.add(new Types.CoupleWH(100, 200));
-        boxes.add(new Types.CoupleWH(200, 100));
-        boxes.add(new Types.CoupleWH(50, 50));
-        boxes.add(new Types.CoupleWH(50, 50));
-        boxes.add(new Types.CoupleWH(100, 100));
-        boxes.add(new Types.CoupleWH(100, 50));
-        boxes.add(new Types.CoupleWH(250, 80));
-        boxes.add(new Types.CoupleWH(100, 200));
-        boxes.add(new Types.CoupleWH(200, 100));
+        boxes.add(new Types.CoupleWH(80, 200));
+        boxes.add(new Types.CoupleWH(80, 200));
+
+//        boxes.add(new Types.CoupleWH(50, 30));
+//        boxes.add(new Types.CoupleWH(50, 30));
+//        boxes.add(new Types.CoupleWH(20, 40));
+//        boxes.add(new Types.CoupleWH(100, 200));
+//        boxes.add(new Types.CoupleWH(200, 100));
+//        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(100, 200));
+//        boxes.add(new Types.CoupleWH(200, 100));
+//        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(50, 50));
+//        boxes.add(new Types.CoupleWH(100, 100));
+//        boxes.add(new Types.CoupleWH(100, 50));
+//        boxes.add(new Types.CoupleWH(250, 80));
+//        boxes.add(new Types.CoupleWH(100, 200));
+//        boxes.add(new Types.CoupleWH(200, 100));
 //
 //        boxes.add(new Types.CoupleWH(250, 80));
 //        boxes.add(new Types.CoupleWH(250, 80));
