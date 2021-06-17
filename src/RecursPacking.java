@@ -15,7 +15,7 @@ class RecursPacking {
         int section = 0;
         int intermediateW;
 
-        ArrayList<Types.Combination> combinations;
+        ArrayList<Types.Combination> combinations = null;
 
         Map<Integer, ArrayList<Types.Rectangle>> rectangles = new HashMap<>();
         ArrayList<Types.Rectangles> sections = new ArrayList<>();
@@ -119,7 +119,7 @@ class RecursPacking {
             if (section == 0)
                 recursive_packing(x, y, w, h, 1, ySection, HeightSection, remaining, sorted_indexes, newAreas, barriers, newRectangles, null);
             else
-                recursive_packing(x, y, w, h, 1, ySection, HeightSection, remaining, sorted_indexes,newAreas, barriers, newRectangles, sections.get(section - 1).getBarriers());
+                recursive_packing(x, y, w, h, 1, ySection, HeightSection, remaining, sorted_indexes, newAreas, barriers, newRectangles, sections.get(section - 1).getBarriers());
 
             barriers.removeIf(barrier -> barrier.getX1() == barrier.getX2());
 
@@ -191,9 +191,6 @@ class RecursPacking {
 //        Comparator<Types.Area> c = Collections.reverseOrder(new Types.sortAreasByWeight());
 //        mon.sort(c);
 
-        //TODO тестирование формирования комбинаций
-        combinations = new PackingHelper().combinationsOfAreas(verticalAreas);
-
         System.out.println("Количество вертикальных областей = " + verticalAreas.size());
         for (int i = 0; i < verticalAreas.size(); i++) {
             System.out.println("Вертикальная область " + i + ": " + verticalAreas.get(i));
@@ -201,12 +198,17 @@ class RecursPacking {
 
         System.out.println("");
 
-        System.out.println("Количество комбинаций = " + combinations.size());
-        for (int i = 0; i < combinations.size(); i++) {
-            System.out.println("Комбинация " + i + ": " + combinations.get(i));
-        }
+        //TODO тестирование формирования комбинаций
+        if (!verticalAreas.isEmpty()) {
+            combinations = new PackingHelper().combinationsOfAreas(verticalAreas);
 
-        System.out.println("");
+            System.out.println("Количество комбинаций = " + combinations.size());
+            for (int i = 0; i < combinations.size(); i++) {
+                System.out.println("Комбинация " + i + ": " + combinations.get(i));
+            }
+
+            System.out.println("");
+        }
 
 //        System.out.println(mon.get(0).getX() + ", " + mon.get(0).getY() + ", " + mon.get(0).getW() + ", " + mon.get(0).getH());
         System.out.println("");
@@ -216,7 +218,9 @@ class RecursPacking {
 //        }
 
         Types.Result result = new Types.Result(y, rectangles, areas);
-        result = new PackingHelper().updatingTape(result, sections, verticalAreas, combinations);
+
+        if (combinations != null)
+            result = new PackingHelper().updatingTape(result, sections, verticalAreas, combinations);
 
         return result;
     }

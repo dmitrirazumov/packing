@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Types {
@@ -115,11 +116,28 @@ public class Types {
             return rectangles;
         }
 
+        public Map<Integer, ArrayList<Types.Rectangle>> getNewMapRectangles() {
+
+            Map<Integer, ArrayList<Types.Rectangle>> newMap = new HashMap<>();
+            ArrayList<Types.Rectangle> getRectangles = new ArrayList<>();
+
+            for (Map.Entry<Integer, ArrayList<Types.Rectangle>> item : rectangles.entrySet()) {
+                for (int i = 0; i < item.getValue().size(); i++) {
+                    getRectangles.add(new Types.Rectangle(item.getValue().get(i).getId(), item.getValue().get(i).getX(), item.getValue().get(i).getY(),
+                            item.getValue().get(i).getW(), item.getValue().get(i).getH()));
+                }
+                newMap.put(item.getKey(), new ArrayList<>(getRectangles));
+                getRectangles.clear();
+            }
+
+            return newMap;
+        }
+
         public ArrayList<Types.Rectangle> getRectangles() {
 
             ArrayList<Types.Rectangle> getRectangles = new ArrayList<>();
 
-            for (Map.Entry<Integer, ArrayList<Types.Rectangle>> item : rectangles.entrySet()){
+            for (Map.Entry<Integer, ArrayList<Types.Rectangle>> item : rectangles.entrySet()) {
                 getRectangles.addAll(item.getValue());
             }
 
@@ -145,17 +163,6 @@ public class Types {
         @Override
         public int compare(Result o1, Result o2) {
             return (int) (o1.HeightStrip - o2.HeightStrip);
-        }
-    }
-
-    static class Section {
-
-        int number;
-        ArrayList<Types.Rectangle> rectangles;
-
-        Section(int number, ArrayList<Types.Rectangle> rectangles) {
-            this.number = number;
-            this.rectangles = rectangles;
         }
     }
 
@@ -203,7 +210,7 @@ public class Types {
         }
 
         public Types.Area getAreasFromSection(int section) {
-                return areas.get(section);
+            return areas.get(section);
 
         }
     }
@@ -348,12 +355,16 @@ public class Types {
         boolean placed;
         ArrayList<BVAreas> areas;
         ArrayList<Types.Rectangle> rectangles;
+        long BVHeight;
+        long BVWeight;
         long rectanglesHeight;
 
-        BiggestVerticalArea(boolean placed, ArrayList<BVAreas> areas, ArrayList<Types.Rectangle> rectangles, long rectanglesHeight) {
+        BiggestVerticalArea(boolean placed, ArrayList<BVAreas> areas, ArrayList<Types.Rectangle> rectangles, long BVHeight, long BVWeight, long rectanglesHeight) {
             this.placed = placed;
             this.areas = areas;
             this.rectangles = rectangles;
+            this.BVHeight = BVHeight;
+            this.BVWeight = BVWeight;
             this.rectanglesHeight = rectanglesHeight;
         }
 
@@ -365,10 +376,22 @@ public class Types {
             return rectangles;
         }
 
+        public long getBVHeight() {
+            return BVHeight;
+        }
+
+        public long getBVWeight() {
+            return BVWeight;
+        }
+
+        public long getRectanglesHeight() {
+            return rectanglesHeight;
+        }
+
         public int getLastNumberOfPut() {
 
             int lastNop = 0;
-            for (Types.BVAreas area: areas) {
+            for (Types.BVAreas area : areas) {
                 if (lastNop < area.getNumberOfPut()) lastNop = area.getNumberOfPut();
             }
 
@@ -435,6 +458,14 @@ public class Types {
         }
     }
 
+    static class sortBVAreasByY implements Comparator<BVAreas> {
+
+        @Override
+        public int compare(BVAreas o1, BVAreas o2) {
+            return (int) (o1.y - o2.y);
+        }
+    }
+
     static class Barrier {
 
         long x1;
@@ -449,7 +480,7 @@ public class Types {
 
         @Override
         public String toString() {
-            return "[" + "(" + x1 + "..." + x2 + ")" + ", "+ y + "]";
+            return "[" + "(" + x1 + "..." + x2 + ")" + ", " + y + "]";
         }
 
         public long getX1() {
@@ -467,9 +498,11 @@ public class Types {
         public void setX1(long x1) {
             this.x1 = x1;
         }
+
         public void setX2(long x2) {
             this.x2 = x2;
         }
+
         public void setY(long y) {
             this.y = y;
         }
