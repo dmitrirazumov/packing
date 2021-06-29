@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -14,7 +13,6 @@ public class Visualisation extends JPanel {
         JFrame frame = new JFrame("Draw Rectangles");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-//        while (RecursPacking.Height < 1200) {
             for (Types.Rectangle element : rectangles) {
                 frame.add(new JPanel() {
                     @Override
@@ -29,10 +27,6 @@ public class Visualisation extends JPanel {
 
                         g2.fill(new Rectangle2D.Double(x, y, width, height));
 
-//                        if (rectangles.indexOf(element) == 3) g2.fill(new Rectangle2D.Double(250, 420, 50, 20));
-//                        if (rectangles.indexOf(element) == 4) g2.fill(new Rectangle2D.Double(340, 340, 10, 80));
-//                        if (rectangles.indexOf(element) == 5) g2.fill(new Rectangle2D.Double(300, 420, 50, 20));
-
                         Font font = new Font("Arial", Font.BOLD, 12);
                         g2.setFont(font);
                         g2.setColor(Color.BLACK);
@@ -45,7 +39,7 @@ public class Visualisation extends JPanel {
                 frame.setVisible(true);
             }
 
-//        for (int i = 0; i < 100000; i++) {
+//        for (int i = 99995; i < 100000; i++) {
 //            int finalI = i;
 //            frame.add(new JPanel() {
 //                @Override
@@ -74,8 +68,6 @@ public class Visualisation extends JPanel {
 //            frame.pack();
 //            frame.setSize(new Dimension(WidthStrip, HeightStrip));
 //            frame.setVisible(true);
-//
-//            if (i == 10) i = 99990;
 //        }
     }
 //    }

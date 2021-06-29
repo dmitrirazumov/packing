@@ -1,19 +1,18 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 class RecursPacking {
 
-    static long Height;
-    public static long endSortingTime1;
     public static long endSortingTime2;
 
+    static long Height;
     static long minW = Long.MAX_VALUE;
 
-    Types.Result spprg(long WidthStrip, ArrayList<Types.CoupleWH> rectanglesWH, String sorting) {
+    Types.Result spprg(long WidthStrip, ArrayList<Types.CoupleWH> rectanglesWH, boolean optimization) {
 
-        int wh = 0;
+        Types.Result result;
         int section = 0;
         int intermediateW;
+        double efficiency;
 
         ArrayList<Types.Combination> combinations = null;
 
@@ -26,11 +25,6 @@ class RecursPacking {
         ArrayList<Types.Area> newAreas = new ArrayList<>();
         ArrayList<Types.Area> verticalAreas = new ArrayList<>();
         ArrayList<Types.Barrier> barriers = new ArrayList<>();
-
-        if (sorting.equals("width"))
-            wh = 0;
-        else if (sorting.equals("height"))
-            wh = 1;
 
         for (Types.CoupleWH element : rectanglesWH) {
             remaining.add(new Types.CoupleWH(element.getW(), element.getH()));
@@ -46,14 +40,10 @@ class RecursPacking {
 
         ArrayList<Types.CoupleWH> copy = new ArrayList<>(remaining);
 
-        if (wh == 0) {
-            Comparator<Types.CoupleWH> c = Collections.reverseOrder(new Types.SortByWidth());
-            endSortingTime1 = System.currentTimeMillis();
-            copy.sort(c);
-            endSortingTime2 = System.currentTimeMillis();
-        }
+        Comparator<Types.CoupleWH> c = Collections.reverseOrder(new Types.SortByWidth());
+        copy.sort(c);
+        endSortingTime2 = System.currentTimeMillis();
 
-        //TODO для невозрастающей высоты
         for (Types.CoupleWH element : copy) {
             sorted_indexes.add(remaining.indexOf(element));
         }
@@ -122,8 +112,6 @@ class RecursPacking {
                 recursive_packing(x, y, w, h, 1, ySection, HeightSection, remaining, sorted_indexes, newAreas, barriers, newRectangles, sections.get(section - 1).getBarriers());
 
             barriers.removeIf(barrier -> barrier.getX1() == barrier.getX2());
-
-            //TODO тестирование формирования вертикальных областей
             newAreas = new PackingHelper().mergingAreas(newAreas);
 
             //формирование новых вертикальных областей
@@ -169,7 +157,7 @@ class RecursPacking {
             sections.add(new Types.Rectangles(section, new ArrayList<>(newRectangles), new ArrayList<>(barriers)));
             rectangles.put(section, new ArrayList<>(newRectangles));
 
-            System.out.println(barriers);
+//            System.out.println(barriers);
 
             newAreas.clear();
             newRectangles.clear();
@@ -180,47 +168,47 @@ class RecursPacking {
             section++;
             Height = H;
         }
-        System.out.println("");
+//        System.out.println("");
 
         //если есть область, ширина которой меньше минимальной ширины элемента, то ее следует удалить, так как в нее не поместится ни один элемент
         //так же необходимо удалить область, находящейся в последней секции, чтобы туда не помещался верхний элемент
         verticalAreas.removeIf(verticalArea -> verticalArea.getW() <= minW ||
                 verticalArea.getY() == sections.get(sections.size() - 1).getRectangles().get(0).getY());
 
-//        ArrayList<Types.Area> mon = new ArrayList<>(verticalAreas);
-//        Comparator<Types.Area> c = Collections.reverseOrder(new Types.sortAreasByWeight());
-//        mon.sort(c);
-
-        System.out.println("Количество вертикальных областей = " + verticalAreas.size());
-        for (int i = 0; i < verticalAreas.size(); i++) {
-            System.out.println("Вертикальная область " + i + ": " + verticalAreas.get(i));
-        }
-
-        System.out.println("");
-
-        //TODO тестирование формирования комбинаций
-        if (!verticalAreas.isEmpty()) {
-            combinations = new PackingHelper().combinationsOfAreas(verticalAreas);
-
-            System.out.println("Количество комбинаций = " + combinations.size());
-            for (int i = 0; i < combinations.size(); i++) {
-                System.out.println("Комбинация " + i + ": " + combinations.get(i));
-            }
-
-            System.out.println("");
-        }
-
-//        System.out.println(mon.get(0).getX() + ", " + mon.get(0).getY() + ", " + mon.get(0).getW() + ", " + mon.get(0).getH());
-        System.out.println("");
-        System.out.println("Количество вертикальных областей = " + verticalAreas.size());
-//        for (Types.Rectangles s : sections) {
-//            System.out.println("Секция " + s.getSection() + ": " + s.getRectangles());
+//        System.out.println("Количество вертикальных областей = " + verticalAreas.size());
+//        for (int i = 0; i < verticalAreas.size(); i++) {
+//            System.out.println("Вертикальная область " + i + ": " + verticalAreas.get(i));
 //        }
 
-        Types.Result result = new Types.Result(y, rectangles, areas);
+        System.out.println("");
 
-        if (combinations != null)
-            result = new PackingHelper().updatingTape(result, sections, verticalAreas, combinations);
+        result = new Types.Result(y, rectangles, areas, 0);
+        efficiency = efficiencyRatio(WidthStrip, y, result.getRectangles());
+        result.setEfficiency(efficiency);
+
+        //оптимизация
+        if (optimization) {
+
+            if (!verticalAreas.isEmpty()) {
+                combinations = new PackingHelper().combinationsOfAreas(verticalAreas);
+
+//                System.out.println("Количество комбинаций = " + combinations.size());
+//                for (int i = 0; i < combinations.size(); i++) {
+//                    System.out.println("Комбинация " + i + ": " + combinations.get(i));
+//                }
+
+//                System.out.println("");
+            }
+
+//            System.out.println("");
+//            System.out.println("Количество вертикальных областей = " + verticalAreas.size());
+
+            if (combinations != null) {
+                result = new PackingHelper().updatingTape(result, verticalAreas, combinations);
+                efficiency = efficiencyRatio(WidthStrip, result.getHeightStrip(), result.getRectangles());
+                result.setEfficiency(efficiency);
+            }
+        }
 
         return result;
     }
@@ -460,7 +448,7 @@ class RecursPacking {
         tapeArea = (double) width * height;
         wasteArea = tapeArea - rectanglesAreas;
 
-        System.out.println("Площадь отходов = " + wasteArea);
+//        System.out.println("Площадь отходов = " + wasteArea);
         return ((wasteArea * 100) / tapeArea);
     }
 }

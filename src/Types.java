@@ -48,7 +48,7 @@ public class Types {
 
     static class Rectangle {
 
-        private int id;
+        private final int id;
         private long x;
         private long y;
         private long w;
@@ -103,13 +103,15 @@ public class Types {
     static class Result {
 
         private long HeightStrip;
-        private Map<Integer, ArrayList<Types.Rectangle>> rectangles;
-        private ArrayList<Types.Areas> emptyAreas;
+        private final Map<Integer, ArrayList<Types.Rectangle>> rectangles;
+        private final ArrayList<Types.Areas> emptyAreas;
+        double efficiency;
 
-        Result(long HeightStrip, Map<Integer, ArrayList<Types.Rectangle>> rectangles, ArrayList<Types.Areas> emptyAreas) {
+        Result(long HeightStrip, Map<Integer, ArrayList<Types.Rectangle>> rectangles, ArrayList<Types.Areas> emptyAreas, double efficiency) {
             this.HeightStrip = HeightStrip;
             this.rectangles = rectangles;
             this.emptyAreas = emptyAreas;
+            this.efficiency = efficiency;
         }
 
         public Map<Integer, ArrayList<Types.Rectangle>> getMapRectangles() {
@@ -156,6 +158,13 @@ public class Types {
             return emptyAreas;
         }
 
+        public double getEfficiency() {
+            return efficiency;
+        }
+
+        public void setEfficiency(double efficiency) {
+            this.efficiency = efficiency;
+        }
     }
 
     static class sortResults implements Comparator<Result> {
@@ -178,10 +187,6 @@ public class Types {
             this.barriers = barriers;
         }
 
-        public int getSection() {
-            return section;
-        }
-
         public ArrayList<Types.Rectangle> getRectangles() {
             return rectangles;
         }
@@ -201,24 +206,15 @@ public class Types {
             this.areas = areas;
         }
 
-        public int getSection() {
-            return section;
-        }
-
         public ArrayList<Types.Area> getAreas() {
             return areas;
-        }
-
-        public Types.Area getAreasFromSection(int section) {
-            return areas.get(section);
-
         }
     }
 
     static class Area implements Cloneable {
 
         private long x;
-        private long y;
+        private final long y;
         private long w;
         private long h;
 
@@ -264,9 +260,7 @@ public class Types {
             if (x != other.x) return false;
             if (y != other.y) return false;
             if (w != other.w) return false;
-            if (h != other.h) return false;
-
-            return true;
+            return h == other.h;
         }
 
         public long getX() {
@@ -279,10 +273,6 @@ public class Types {
 
         public long getY() {
             return y;
-        }
-
-        public void setY(long y) {
-            this.y = y;
         }
 
         public long getW() {
@@ -302,14 +292,6 @@ public class Types {
         }
     }
 
-//    static class sortAreasByHeight implements Comparator<Area> {
-//
-//        @Override
-//        public int compare(Area o1, Area o2) {
-//            return (int) (o1.h - o2.h);
-//        }
-//    }
-
     static class sortAreasByWeight implements Comparator<Area> {
 
         @Override
@@ -320,7 +302,7 @@ public class Types {
 
     static class Combination {
 
-        private ArrayList<Integer> combination;
+        private final ArrayList<Integer> combination;
 
         Combination(ArrayList<Integer> combination) {
             this.combination = combination;
@@ -356,15 +338,13 @@ public class Types {
         ArrayList<BVAreas> areas;
         ArrayList<Types.Rectangle> rectangles;
         long BVHeight;
-        long BVWeight;
         long rectanglesHeight;
 
-        BiggestVerticalArea(boolean placed, ArrayList<BVAreas> areas, ArrayList<Types.Rectangle> rectangles, long BVHeight, long BVWeight, long rectanglesHeight) {
+        BiggestVerticalArea(boolean placed, ArrayList<BVAreas> areas, ArrayList<Types.Rectangle> rectangles, long BVHeight, long rectanglesHeight) {
             this.placed = placed;
             this.areas = areas;
             this.rectangles = rectangles;
             this.BVHeight = BVHeight;
-            this.BVWeight = BVWeight;
             this.rectanglesHeight = rectanglesHeight;
         }
 
@@ -378,10 +358,6 @@ public class Types {
 
         public long getBVHeight() {
             return BVHeight;
-        }
-
-        public long getBVWeight() {
-            return BVWeight;
         }
 
         public long getRectanglesHeight() {
